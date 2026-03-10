@@ -3,72 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lembrete de Dádiva - DevvingDoc</title>
+    <title>Lembrete de Dadiva</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 40px 20px; background-color: #f4f7f6; color: #333; }
-        .container { background: white; padding: 35px 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 380px; margin: auto; border: 1px solid #e0e0e0; }
-        h2 { color: #d32f2f; margin-top: 0; }
-        p { font-size: 16px; line-height: 1.5; color: #555; margin-bottom: 30px; }
-        .btn { display: block; width: 100%; padding: 20px; margin: 15px 0; border: none; border-radius: 16px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: all 0.2s ease; }
-        .btn-male { background-color: #007bff; }
-        .btn-female { background-color: #d63384; }
-        .footer { font-size: 13px; color: #999; margin-top: 35px; border-top: 1px solid #eee; padding-top: 20px; }
+        body { font-family: -apple-system, system-ui, sans-serif; text-align: center; padding: 40px 20px; background-color: #f4f7f6; color: #333; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 350px; margin: auto; }
+        h2 { color: #d32f2f; margin-bottom: 20px; }
+        .btn { display: block; width: 100%; padding: 20px; margin: 15px 0; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-m { background-color: #007bff; }
+        .btn-f { background-color: #d63384; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🩸 Próxima Dádiva</h2>
-        <p>Obrigado pelo seu gesto altruísta!<br><br>Escolha a sua opção para agendar o lembrete no telemóvel:</p>
+        <h2>Próxima Dádiva</h2>
+        <p>Selecione para agendar o seu lembrete:</p>
         
-        <button class="btn btn-male" onclick="addCalendar(90)">Homem (3 meses)</button>
-        <button class="btn btn-female" onclick="addCalendar(120)">Mulher (4 meses)</button>
-        
-        <div class="footer">
-            O calendário abrirá automaticamente.<br>
-            <b>Confirme e clique em "Guardar".</b>
-        </div>
+        <button class="btn btn-m" onclick="addCal(90)">Homem (3 meses)</button>
+        <button class="btn btn-f" onclick="addCal(120)">Mulher (4 meses)</button>
     </div>
 
     <script>
-        function addCalendar(days) {
-            const date = new Date();
-            date.setDate(date.getDate() + days);
-            
-            // Format: YYYYMMDDTHHMMSSZ
-            const formatDir = (d) => d.toISOString().replace(/-|:|\.\d+/g, "").split("T")[0] + "T100000Z";
-            const dateStr = formatDir(date);
-            const nowStr = formatDir(new Date());
+        function addCal(days) {
+            const now = new Date();
+            const eventDate = new Date();
+            eventDate.setDate(now.getDate() + days);
 
-            const icsLines = [
+            const f = (d) => d.toISOString().replace(/-|:|\.\d+/g, "").split("T")[0] + "T100000Z";
+            const start = f(eventDate);
+            const stamp = f(now);
+
+            // Using simple text without accents for technical fields to ensure compatibility
+            const ics = [
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
-                "PRODID:-//DevvingDoc//NextDonation//PT",
+                "PRODID:-//DevDoc//Next//PT",
                 "BEGIN:VEVENT",
-                "UID:" + Date.now() + "@devvingdoc.github.io",
-                "DTSTAMP:" + nowStr,
-                "DTSTART:" + dateStr,
-                "DTEND:" + dateStr.replace("T100000", "T110000"),
-                "SUMMARY:Próxima Dádiva de Sangue 🩸",
-                "DESCRIPTION:Já pode voltar a salvar vidas! Obrigado pela sua generosidade.",
+                "UID:" + Date.now() + "@devdoc",
+                "DTSTAMP:" + stamp,
+                "DTSTART:" + start,
+                "DTEND:" + start.replace("T100000", "T110000"),
+                "SUMMARY:Proxima Dadiva de Sangue",
+                "DESCRIPTION:Obrigado por ajudar a salvar vidas!",
                 "BEGIN:VALARM",
                 "TRIGGER:-P7D",
                 "ACTION:DISPLAY",
-                "DESCRIPTION:Lembrete de Dádiva",
+                "DESCRIPTION:Lembrete de Dadiva",
                 "END:VALARM",
                 "END:VEVENT",
                 "END:VCALENDAR"
-            ];
+            ].join("\r\n");
 
-            const icsContent = icsLines.join("\r\n");
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'Lembrete_Dadiva.ics');
-            document.body.appendChild(link);
+            const link = document.createElement("a");
+            link.href = "data:text/calendar;charset=utf8," + encodeURIComponent(ics);
+            link.download = "lembrete.ics";
             link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
